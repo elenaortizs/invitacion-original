@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Linda, ¿café?</title>
+  <!-- Favicon emoji café -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☕</text></svg>" />
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <!-- Calendly widget CSS -->
+  <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet" />
+
+  <style>
+    /* ─── Tokens ──────────────────────────────────────────── */
+    :root {
+      --cream:    #FAF7F4;
+      --latte:    #E8DDD4;
+      --espresso: #4A3728;
+      --caramel:  #C08B5C;
+      --foam:     #FFFFFF;
+      --muted:    #9A8880;
+      --radius:   18px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--cream);
+      background-image:
+        radial-gradient(circle at 20% 80%, #EDE4DA55 0%, transparent 60%),
+        radial-gradient(circle at 80% 20%, #D4C8BC44 0%, transparent 50%);
+      font-family: 'Inter', sans-serif;
+      padding: 1rem;
+    }
+
+    /* ─── Card ──────────────────────────────────────────── */
+    .card-wrap {
+      background: var(--foam);
+      border-radius: 28px;
+      box-shadow: 0 8px 40px rgba(74,55,40,.12), 0 2px 8px rgba(74,55,40,.06);
+      padding: clamp(1.5rem, 5vw, 3rem) clamp(1.25rem, 5vw, 3rem);
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+      position: relative;
+      animation: cardIn .6s cubic-bezier(.22,1,.36,1) both;
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(20px) scale(.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* ─── Screens (pantallas) ────────────────────────────── */
+    /* Solo la pantalla activa es visible */
+    .screen { display: none; }
+    .screen.active {
+      display: block;
+      animation: cardIn .45s cubic-bezier(.22,1,.36,1) both;
+    }
+
+    /* ─── Cup emoji ─────────────────────────────────────── */
+    .cup-emoji {
+      font-size: clamp(2.4rem, 8vw, 3.2rem);
+      display: block;
+      margin-bottom: .6rem;
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-6px); }
+    }
+
+    /* ─── Headings ──────────────────────────────────────── */
+    h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(1.45rem, 5vw, 2rem);
+      font-weight: 700;
+      color: var(--espresso);
+      margin-bottom: .45rem;
+      line-height: 1.2;
+    }
+    h2 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(1.2rem, 4.5vw, 1.7rem);
+      font-weight: 700;
+      color: var(--espresso);
+      margin-bottom: .4rem;
+      line-height: 1.25;
+    }
+    .subtitle {
+      font-size: clamp(.85rem, 3vw, .95rem);
+      color: var(--muted);
+      margin-bottom: 1.75rem;
+    }
+
+    /* ─── Button area ────────────────────────────────────── */
+    .btn-area {
+      position: relative;
+      min-height: 130px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .75rem;
+    }
+
+    /* ─── Buttons ────────────────────────────────────────── */
+    .btn-yes, .btn-no, .btn-second-chance {
+      border: none;
+      border-radius: var(--radius);
+      padding: .85rem 2.2rem;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: clamp(.95rem, 3.5vw, 1.05rem);
+      cursor: pointer;
+      transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+
+    /* Sí principal */
+    .btn-yes {
+      background: var(--espresso);
+      color: var(--cream);
+      width: 100%;
+      max-width: 260px;
+      box-shadow: 0 4px 18px rgba(74,55,40,.22);
+    }
+    .btn-yes:hover, .btn-yes:focus-visible {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(74,55,40,.30);
+      background: #5e4736;
+    }
+    .btn-yes:active { transform: translateY(0); }
+
+    /* No */
+    .btn-no {
+      background: var(--latte);
+      color: var(--espresso);
+      width: 200px;
+      box-shadow: 0 2px 10px rgba(74,55,40,.10);
+    }
+    .btn-no:hover { background: #ddd0c5; }
+    .btn-no.roaming {
+      position: absolute;
+      width: auto;
+      padding: .7rem 1.6rem;
+      font-size: .92rem;
+    }
+
+    /* Segunda oportunidad (en pantalla gato) */
+    .btn-second-chance {
+      background: var(--espresso);
+      color: var(--cream);
+      width: 100%;
+      max-width: 260px;
+      box-shadow: 0 4px 18px rgba(74,55,40,.22);
+      margin-top: .25rem;
+    }
+    .btn-second-chance:hover, .btn-second-chance:focus-visible {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(74,55,40,.30);
+      background: #5e4736;
+    }
+
+    /* ─── Bocadillo ──────────────────────────────────────── */
+    .bubble {
+      position: absolute;
+      bottom: calc(100% + 10px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--espresso);
+      color: #fff;
+      font-size: .78rem;
+      font-weight: 500;
+      padding: .4rem .8rem;
+      border-radius: 12px;
+      white-space: nowrap;
+      pointer-events: none;
+      filter: drop-shadow(0 2px 6px rgba(74,55,40,.25));
+      animation: bubbleIn .25s cubic-bezier(.22,1,.36,1) both;
+    }
+    .bubble::after {
+      content: '';
+      position: absolute;
+      top: 100%; left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: var(--espresso);
+    }
+    @keyframes bubbleIn {
+      from { opacity: 0; transform: translateX(-50%) translateY(-6px) scale(.92); }
+      to   { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+    }
+    @keyframes bubbleOut {
+      from { opacity: 1; }
+      to   { opacity: 0; }
+    }
+    .bubble.hiding { animation: bubbleOut .3s ease both; }
+
+    /* ─── Gato con botas ─────────────────────────────────── */
+    .cat-img {
+      width: min(220px, 60vw);
+      height: auto;
+      border-radius: 20px;
+      margin: .5rem auto 1.25rem;
+      display: block;
+      /* Ligera sombra cálida */
+      box-shadow: 0 6px 28px rgba(74,55,40,.18);
+      /* Wobble de entrada */
+      animation: wobbleIn .5s cubic-bezier(.22,1,.36,1) both;
+    }
+    @keyframes wobbleIn {
+      0%   { opacity: 0; transform: scale(.8) rotate(-4deg); }
+      60%  { transform: scale(1.05) rotate(2deg); }
+      100% { opacity: 1; transform: scale(1) rotate(0deg); }
+    }
+
+    .reject-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(1.2rem, 4.5vw, 1.6rem);
+      color: var(--espresso);
+      line-height: 1.3;
+      margin-bottom: .5rem;
+    }
+    .reject-sub {
+      font-size: clamp(.82rem, 3vw, .9rem);
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+
+    /* ─── Success / Calendly ─────────────────────────────── */
+    .success-block h2 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(1.2rem, 4.5vw, 1.8rem);
+      color: var(--espresso);
+      margin-bottom: .5rem;
+    }
+    .success-block .tagline {
+      font-size: clamp(.82rem, 3vw, .9rem);
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+    }
+    .latte-line {
+      width: 40px; height: 3px;
+      background: var(--latte);
+      border-radius: 99px;
+      margin: 1rem auto;
+    }
+    .calendly-wrap {
+      margin-top: 1rem;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1.5px solid var(--latte);
+    }
+    .calendly-inline-widget {
+      min-width: 100% !important;
+      height: 620px;
+    }
+
+    /* ─── Reduced motion ─────────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      .cup-emoji, .card-wrap, .cat-img, .screen { animation: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="card-wrap" id="mainCard">
+
+  <!-- ══ PANTALLA 1: Invitación ══ -->
+  <div class="screen active" id="screenInvite">
+    <span class="cup-emoji">☕</span>
+    <h1>¿Te apetece tomar<br>un café?</h1>
+        <p class="subtitle"></p>
+    <div class="btn-area" id="btnArea">
+      <button class="btn-yes" id="btnYes">Sí ☕</button>
+      <button class="btn-no"  id="btnNo">No 😒</button>
+    </div>
+  </div>
+
+  <!-- ══ PANTALLA 2: Gato con botas triste ══ -->
+  <div class="screen" id="screenCat">
+    <!-- GIF público del Gato con Botas ojos tristes (Shrek 2 / DreamWorks) -->
+
+    <p class="reject-title">¿De verdad me lo estás<br>rechazando?</p>
+        <img
+      class="cat-img"
+      src="https://media1.tenor.com/m/HPht2t341E8AAAAC/puppy-dog-eyes-sad.gif"
+      alt="Gato con botas con ojos tristes"
+    />
+    <p class="reject-sub">Venga, tienes otra oportunidad...¿Quieres tomar café?</p>
+    <button class="btn-second-chance" id="btnSecondChance">Sí ☕</button>
+  </div>
+
+  <!-- ══ PANTALLA 3: Éxito + Calendly ══ -->
+  <div class="screen success-block" id="screenSuccess">
+    <span class="cup-emoji">🥳</span>
+    <h2>Tenía la intuición<br>de que aceptarías.</h2>
+    <p class="subtitle">Por lo que sea 😂</p>
+    <p class="subtitle">Mira, hasta te dejo elegir cuando y puedes guardarlo en el Google Calendar que se que te gusta</p>
+    <div class="latte-line"></div>
+    <div class="calendly-wrap">
+      <div
+        class="calendly-inline-widget"
+        data-url="https://calendly.com/elenaortizsobrino/30min"
+        data-primary-color="4A3728"
+      ></div>
+    </div>
+  </div>
+
+</div><!-- /card-wrap -->
+
+<!-- canvas-confetti -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Calendly widget JS -->
+<script src="https://assets.calendly.com/assets/external/widget.js" async></script>
+
+<script>
+  /* ── Elementos ─────────────────────────────────────────── */
+  const btnYes          = document.getElementById('btnYes');
+  const btnNo           = document.getElementById('btnNo');
+  const btnArea         = document.getElementById('btnArea');
+  const btnSecondChance = document.getElementById('btnSecondChance');
+
+  const screenInvite  = document.getElementById('screenInvite');
+  const screenCat     = document.getElementById('screenCat');
+  const screenSuccess = document.getElementById('screenSuccess');
+
+  /* ── Mensajes bocadillo ────────────────────────────────── */
+  const DODGE_MESSAGES = [
+    "Uy, casi...",
+    "¿Segura?",
+    "Piénsalo mejor.",
+    "¿En serio me vas a rechazar un café? 🫠",
+    "Respuesta incorrecta.",
+    "Venga mujer.",
+    "Estoy empezando a tomármelo personal 😠",
+    "El botón funciona perfecto. El problema eres tú.",
+    "Vengaaa...Dale otra vuelta.",
+    "Sabía que intentarías pulsarlo 🙄"
+    ];
+
+  let lastMsgIndex = -1;
+  let roaming      = false;
+  let bubbleTimer  = null;
+  let dodgeCount   = 0;       // cuántas veces esquivó
+  let lastDodgeAt  = 0;       // evita dobles disparos por la misma interacción
+  const MAX_DODGES = 3;       // a la 3ª esquiva, muestra la pantalla del gato
+
+  /* ── Utilidades ────────────────────────────────────────── */
+  function goToScreen(hide, show) {
+    hide.classList.remove('active');
+    // pequeño delay para que la animación de salida no solape
+    setTimeout(() => show.classList.add('active'), 60);
+  }
+
+  function pickMessage() {
+    let idx;
+    do { idx = Math.floor(Math.random() * DODGE_MESSAGES.length); }
+    while (idx === lastMsgIndex);
+    lastMsgIndex = idx;
+    return DODGE_MESSAGES[idx];
+  }
+
+  function showBubble(text) {
+    const old = btnNo.querySelector('.bubble');
+    if (old) old.remove();
+    clearTimeout(bubbleTimer);
+
+    const bbl = document.createElement('span');
+    bbl.className = 'bubble';
+    bbl.textContent = text;
+    btnNo.appendChild(bbl);
+
+    bubbleTimer = setTimeout(() => {
+      bbl.classList.add('hiding');
+      setTimeout(() => bbl.remove(), 300);
+    }, 2200);
+  }
+
+  function randomPosition() {
+    const areaRect = btnArea.getBoundingClientRect();
+    const btnRect  = btnNo.getBoundingClientRect();
+    const margin   = 8;
+    const maxX = areaRect.width  - btnRect.width  - margin;
+    const maxY = areaRect.height - btnRect.height - margin;
+    return {
+      x: margin + Math.random() * (maxX - margin),
+      y: margin + Math.random() * (maxY - margin),
+    };
+  }
+
+  /* ── Lanzar confeti ────────────────────────────────────── */
+  function launchConfetti() {
+    const colors = ['#C08B5C', '#4A3728', '#E8DDD4', '#FAF7F4', '#d4a574'];
+    confetti({ particleCount: 90, spread: 80, origin: { y: 0.45 }, colors, scalar: 1.1 });
+    setTimeout(() => {
+      confetti({ particleCount: 55, spread: 100, origin: { x: 0.15, y: 0.5 }, colors, angle: 60 });
+      confetti({ particleCount: 55, spread: 100, origin: { x: 0.85, y: 0.5 }, colors, angle: 120 });
+    }, 350);
+  }
+
+  /* ── Ir a pantalla de éxito ────────────────────────────── */
+  function showSuccess(fromScreen) {
+    goToScreen(fromScreen, screenSuccess);
+    launchConfetti();
+  }
+
+  /* ── Esquiva ───────────────────────────────────────────── */
+  function dodge(countForCat = false) {
+    if (countForCat) {
+      dodgeCount++;
+    }
+
+    // Solo pulsando cuenta para mostrar pantalla del gato
+    if (countForCat && dodgeCount >= MAX_DODGES) {
+      goToScreen(screenInvite, screenCat);
+      return;
+    }
+
+    if (!roaming) {
+      const rect     = btnNo.getBoundingClientRect();
+      const areaRect = btnArea.getBoundingClientRect();
+      btnNo.classList.add('roaming');
+      btnNo.style.left      = (rect.left - areaRect.left) + 'px';
+      btnNo.style.top       = (rect.top  - areaRect.top)  + 'px';
+      btnNo.style.transform = 'none';
+      roaming = true;
+    }
+
+    const pos = randomPosition();
+    btnNo.style.transition = 'left .35s cubic-bezier(.22,1,.36,1), top .35s cubic-bezier(.22,1,.36,1)';
+    btnNo.style.left = pos.x + 'px';
+    btnNo.style.top  = pos.y + 'px';
+    showBubble(pickMessage());
+  }
+
+  function requestDodge(countForCat = false) {
+    const now = performance.now();
+    if (now - lastDodgeAt < 240) return;
+    lastDodgeAt = now;
+    dodge(countForCat);
+  }
+
+  /* ── Listeners botón No ────────────────────────────────── */
+  btnNo.addEventListener('pointerenter', (e) => {
+    if (e.pointerType === 'mouse' && window.matchMedia('(hover: hover)').matches) {
+      requestDodge(false);
+    }
+  });
+  btnNo.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    requestDodge(true);
+  }, { passive: false });
+
+  /* ── Listeners botones Sí ──────────────────────────────── */
+  btnYes.addEventListener('click', () => showSuccess(screenInvite));
+  btnSecondChance.addEventListener('click', () => showSuccess(screenCat));
+</script>
+
+</body>
+</html>
